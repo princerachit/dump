@@ -105,6 +105,7 @@ metadata:
   namespace: default
 spec:
   serviceAccount: csi-service-account
+  hostNetwork: true
   containers:
   - name: external-provisioner
     args:
@@ -155,17 +156,32 @@ spec:
       value: "default"
     - name: CSI_ENDPOINTS
       value: unix:///csi/csi.sock
-    image: rachitprince/csi-openebs:v0.0.1
+    - name: CHROOT_DIR
+      value: "/node"
+    image: rachitprince/csi-openebs:v0.0.2
     imagePullPolicy: Always
     securityContext:
       privileged: true
+      allowPrivilegeEscalation: true
     volumeMounts:
+#    - mountPath: /node
+#      name: root
     - mountPath: /csi
       name: socket-dir
+    - mountPath: /usr/bin/iscsiadm
+      name: iscsiadm
+    - mountPath: /usr/sbin/iscsid
+      name: iscsid
+    - mountPath: /etc/iscsi
+      name: iscsi
     - mountPath: /var/lib/kubelet/pods
       mountPropagation: Bidirectional
       name: mountpoint-dir
   volumes:
+  - hostPath:
+      path: /etc/iscsi 
+      type: Directory
+    name: iscsi
   - hostPath:
       path: /var/lib/kubelet/plugins/csi-openebs
       type: DirectoryOrCreate
@@ -174,3 +190,15 @@ spec:
       path: /var/lib/kubelet/pods
       type: DirectoryOrCreate
     name: mountpoint-dir
+#  - hostPath:
+#      path: /
+#      type: Directory
+#    name: root
+  - hostPath:
+      path: /usr/sbin/iscsid
+      type: File
+    name: iscsid
+  - hostPath:
+      path: /usr/bin/iscsiadm
+      type: File
+    name: iscsiadm
