@@ -161,32 +161,32 @@ spec:
           - mountPath: /var/lib/kubelet/pods
             mountPropagation: Bidirectional
             name: mountpoint-dir
-        volumes:
-        - hostPath:
-            path: /etc/iscsi
-            type: Directory
-          name: iscsi
-        - hostPath:
-            path: /var/lib/kubelet/plugins/csi-openebs
-            type: DirectoryOrCreate
-          name: socket-dir
-        - hostPath:
-            path: /var/lib/kubelet/pods
-            type: DirectoryOrCreate
-          name: mountpoint-dir
-        - hostPath:
-            path: /dev
-            type: Directory
-          name: dev
-        - hostPath:
-            path: /usr/sbin/iscsid
-            type: File
-          name: iscsid
-        - hostPath:
-            path: /usr/bin/iscsiadm
-            type: File
-          name: iscsiadm
- ---
+      volumes:
+      - hostPath:
+          path: /etc/iscsi
+          type: Directory
+        name: iscsi
+      - hostPath:
+          path: /var/lib/kubelet/plugins/csi-openebs
+          type: DirectoryOrCreate
+        name: socket-dir
+      - hostPath:
+          path: /var/lib/kubelet/pods
+          type: DirectoryOrCreate
+        name: mountpoint-dir
+      - hostPath:
+          path: /dev
+          type: Directory
+        name: dev
+      - hostPath:
+          path: /usr/sbin/iscsid
+          type: File
+        name: iscsid
+      - hostPath:
+          path: /usr/bin/iscsiadm
+          type: File
+        name: iscsiadm
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -239,7 +239,7 @@ spec:
           volumeMounts:
           - mountPath: /csi
             name: socket-dir
-        volumes:
-          - emptyDir: {}
-            name: socket-dir
+      volumes:
+        - emptyDir: {}
+          name: socket-dir
 ---
