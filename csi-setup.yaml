@@ -135,9 +135,9 @@ spec:
           env:
           - name: KUBE_NODE_NAME
             valueFrom:
-          		fieldRef:
-          		  apiVersion: v1
-          		  fieldPath: spec.nodeName
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
           - name: "OPENEBS_NAMESPACE"
             value: "default"
           - name: CSI_ENDPOINTS
