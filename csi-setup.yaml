@@ -96,109 +96,150 @@ subjects:
   name: csi-service-account
   namespace: default
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
-  labels:
-    app: openebs-driver
-  name: csi-pod-new
-  namespace: default
+  name: csi-openebs-daemon
+  namespace: deafult
+spec:
+  selector:
+    matchLabels:
+      app: openebs-node-plugin
+  template:
+    metadata:
+      labels:
+        app: openebs-node-plugin
+    spec:
+      serviceAccount: csi-service-account
+      hostNetwork: true
+      containers:
+    	  - name: driver-registrar
+    	    args:
+    	    - --v=5
+    	    - --csi-address=/csi/csi.sock
+    	    env:
+    	    - name: KUBE_NODE_NAME
+    	      valueFrom:
+    		      fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+    	    image: quay.io/k8scsi/driver-registrar:v0.2.0
+    	    volumeMounts:
+    	    - mountPath: /csi
+    	      name: socket-dir
+    	  - name: openebs-driver
+    	    args:
+    	    - --v=5
+    	    - --nodeid=$(KUBE_NODE_NAME)
+    	    - --endpoint=$(CSI_ENDPOINTS)
+    	    env:
+    	    - name: KUBE_NODE_NAME
+    	      valueFrom:
+          		fieldRef:
+          		  apiVersion: v1
+          		  fieldPath: spec.nodeName
+    	    - name: "OPENEBS_NAMESPACE"
+    	      value: "default"
+    	    - name: CSI_ENDPOINTS
+    	      value: unix:///csi/csi.sock
+    	    image: rachitprince/csi-openebs:v0.0.2
+    	    imagePullPolicy: Always
+    	    securityContext:
+    	      privileged: true
+    	      allowPrivilegeEscalation: true
+    	    volumeMounts:
+    	    - mountPath: /dev
+    	      name: dev
+    	    - mountPath: /csi
+    	      name: socket-dir
+    	    - mountPath: /usr/bin/iscsiadm
+    	      name: iscsiadm
+    	    - mountPath: /usr/sbin/iscsid
+    	      name: iscsid
+    	    - mountPath: /etc/iscsi
+    	      name: iscsi
+    	    - mountPath: /var/lib/kubelet/pods
+    	      mountPropagation: Bidirectional
+    	      name: mountpoint-dir
+    	  volumes:
+    	  - hostPath:
+    	      path: /etc/iscsi
+    	      type: Directory
+    	    name: iscsi
+    	  - hostPath:
+    	      path: /var/lib/kubelet/plugins/csi-openebs
+    	      type: DirectoryOrCreate
+    	    name: socket-dir
+    	  - hostPath:
+    	      path: /var/lib/kubelet/pods
+    	      type: DirectoryOrCreate
+    	    name: mountpoint-dir
+    	  - hostPath:
+    	      path: /dev
+    	      type: Directory
+    	    name: dev
+    	  - hostPath:
+    	      path: /usr/sbin/iscsid
+    	      type: File
+    	    name: iscsid
+    	  - hostPath:
+    	      path: /usr/bin/iscsiadm
+    	      type: File
+    	    name: iscsiadm
+ ---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: csi-openebs-statefulset
 spec:
   serviceAccount: csi-service-account
-  hostNetwork: true
-  containers:
-  - name: external-provisioner
-    args:
-    - --v=5
-    - --provisioner=csi-openebs
-    - --csi-address=/csi/csi.sock
-    image: quay.io/k8scsi/csi-provisioner:v0.2.0
-    volumeMounts:
-    - mountPath: /csi
-      name: socket-dir
-  - name: driver-registrar
-    args:
-    - --v=5
-    - --csi-address=/csi/csi.sock
-    env:
-    - name: KUBE_NODE_NAME
-      valueFrom:
-        fieldRef:
-          apiVersion: v1
-          fieldPath: spec.nodeName
-    image: quay.io/k8scsi/driver-registrar:v0.2.0
-    volumeMounts:
-    - mountPath: /csi
-      name: socket-dir
-  - name: external-attacher
-    args:
-    - --v=5
-    - --csi-address=$(ADDRESS)
-    env:
-    - name: ADDRESS
-      value: /csi/csi.sock
-    image: quay.io/k8scsi/csi-attacher:v0.2.0
-    volumeMounts:
-    - mountPath: /csi
-      name: socket-dir
-  - name: openebs-driver
-    args:
-    - --v=5
-    - --nodeid=$(KUBE_NODE_NAME)
-    - --endpoint=$(CSI_ENDPOINTS)
-    env:
-    - name: KUBE_NODE_NAME
-      valueFrom:
-        fieldRef:
-          apiVersion: v1
-          fieldPath: spec.nodeName
-    - name: "OPENEBS_NAMESPACE"
-      value: "default"
-    - name: CSI_ENDPOINTS
-      value: unix:///csi/csi.sock
-    - name: CHROOT_DIR
-      value: "/node"
-    image: rachitprince/csi-openebs:v0.0.2
-    imagePullPolicy: Always
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-    volumeMounts:
-    - mountPath: /dev
-      name: dev
-    - mountPath: /csi
-      name: socket-dir
-    - mountPath: /usr/bin/iscsiadm
-      name: iscsiadm
-    - mountPath: /usr/sbin/iscsid
-      name: iscsid
-    - mountPath: /etc/iscsi
-      name: iscsi
-    - mountPath: /var/lib/kubelet/pods
-      mountPropagation: Bidirectional
-      name: mountpoint-dir
-  volumes:
-  - hostPath:
-      path: /etc/iscsi 
-      type: Directory
-    name: iscsi
-  - hostPath:
-      path: /var/lib/kubelet/plugins/csi-openebs
-      type: DirectoryOrCreate
-    name: socket-dir
-  - hostPath:
-      path: /var/lib/kubelet/pods
-      type: DirectoryOrCreate
-    name: mountpoint-dir
-  - hostPath:
-      path: /dev
-      type: Directory
-    name: dev 
-  - hostPath:
-      path: /usr/sbin/iscsid
-      type: File
-    name: iscsid
-  - hostPath:
-      path: /usr/bin/iscsiadm
-      type: File
-    name: iscsiadm
+  selector:
+    matchLabels:
+      app: openebs-controller-plugin # has to match .spec.template.metadata.labels
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: openebs-controller-plugin
+    spec:
+      containers:
+      - name: external-provisioner
+        args:
+        - --v=5
+        - --provisioner=csi-openebs
+        - --csi-address=/var/lib/csi/sockets/pluginproxy/csi/csi.sock
+        image: quay.io/k8scsi/csi-provisioner:v0.2.0
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/csi
+          name: socket-dir
+      - name: external-attacher
+        args:
+        - --v=5
+        - --csi-address=$(ADDRESS)
+        env:
+        - name: ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi/csi.sock
+        image: quay.io/k8scsi/csi-attacher:v0.2.0
+        volumeMounts:
+        - mountPath: /csi
+          name: socket-dir
+      - name: openebs-driver
+        args:
+        - --endpoint=$(CSI_ENDPOINTS)
+        env:
+        - name: "OPENEBS_NAMESPACE"
+          value: "default"
+        - name: CSI_ENDPOINTS
+          value: unix:///var/lib/csi/sockets/pluginproxy/csi/csi.sock
+        image: rachitprince/csi-openebs:v0.0.2
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+        volumeMounts:
+        - mountPath: /csi
+          name: socket-dir
+      volumes:
+        - emptyDir: {}
+          name: socket-dir
+---
