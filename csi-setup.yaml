@@ -100,7 +100,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: csi-openebs-daemon
-  namespace: deafult
+  namespace: default
 spec:
   selector:
     matchLabels:
@@ -192,7 +192,7 @@ kind: StatefulSet
 metadata:
   name: csi-openebs-statefulset
 spec:
-  serviceAccount: csi-service-account
+  serviceName: "openebs-controller-plugin"
   selector:
     matchLabels:
       app: openebs-controller-plugin # has to match .spec.template.metadata.labels
@@ -202,15 +202,16 @@ spec:
       labels:
         app: openebs-controller-plugin
     spec:
+      serviceAccount: csi-service-account
       containers:
         - name: external-provisioner
           args:
           - --v=5
           - --provisioner=csi-openebs
-          - --csi-address=/var/lib/csi/sockets/pluginproxy/csi/csi.sock
+          - --csi-address=/var/lib/csi/sockets/pluginproxy/csi.sock
           image: quay.io/k8scsi/csi-provisioner:v0.2.0
           volumeMounts:
-          - mountPath: /var/lib/csi/sockets/pluginproxy/csi
+          - mountPath: /var/lib/csi/sockets/pluginproxy
             name: socket-dir
         - name: external-attacher
           args:
@@ -218,10 +219,10 @@ spec:
           - --csi-address=$(ADDRESS)
           env:
           - name: ADDRESS
-            value: /var/lib/csi/sockets/pluginproxy/csi/csi.sock
+            value: /var/lib/csi/sockets/pluginproxy/csi.sock
           image: quay.io/k8scsi/csi-attacher:v0.2.0
           volumeMounts:
-          - mountPath: /csi
+          - mountPath: /var/lib/csi/sockets/pluginproxy/
             name: socket-dir
         - name: openebs-driver
           args:
@@ -230,14 +231,14 @@ spec:
           - name: "OPENEBS_NAMESPACE"
             value: "default"
           - name: CSI_ENDPOINTS
-            value: unix:///var/lib/csi/sockets/pluginproxy/csi/csi.sock
+            value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
           image: rachitprince/csi-openebs:v0.0.2
           imagePullPolicy: Always
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
           volumeMounts:
-          - mountPath: /csi
+          - mountPath: /var/lib/csi/sockets/pluginproxy
             name: socket-dir
       volumes:
         - emptyDir: {}
