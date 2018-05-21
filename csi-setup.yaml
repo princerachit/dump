@@ -142,7 +142,7 @@ spec:
             value: "default"
           - name: CSI_ENDPOINTS
             value: unix:///csi/csi.sock
-          image: rachitprince/csi-openebs:v0.0.2
+          image: rachitprince/csi-openebs:v1.0.0
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -232,7 +232,7 @@ spec:
             value: "default"
           - name: CSI_ENDPOINTS
             value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
-          image: rachitprince/csi-openebs:v0.0.2
+          image: rachitprince/csi-openebs:v1.0.0
           imagePullPolicy: Always
           securityContext:
             privileged: true
