@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cstor-volume-create-put-cr-0.7.0
+  namespace: default
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: CStorVolume
+    action: put
+    queries:
+      - alias: objectName
+      - alias: cstorid
+          path: |-
+            {.spec.ID}
+  task: |
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    metadata:
+      name: {{ .Volume.owner }}
+      spec:
+        cstorControllerIP: {{ .Taskresult.vsvc.clusterIP}}
+        volumeName: {{ .Volume.owner }}
+        capacity: {{ .Volume.capacity }}
+        status: init
