@@ -4,10 +4,8 @@ metadata:
   name: cast-standard-0.7.0
 spec:
   defaultConfig:
-  - name: VolumeMonitor
-    enabled: "true"
   - name: ControllerImage
-    value: openebs/cstor:0.5.0
+    value: moteesh/cstor-volume-mgmt:local
   - name: ReplicaCount
     value: "1"
   - name: StoragePool

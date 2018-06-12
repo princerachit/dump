@@ -56,7 +56,7 @@ data:
           - args:
             - --cstor-id
             - {{ .TaskResult.vcr.cstorid }}
-          - image: {{ .Config.ControllerImage.value }}
+            image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
             ports:
             - containerPort: 3260
