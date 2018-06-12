@@ -13,7 +13,7 @@ data:
       - alias: objectName
       - alias: clusterIP
           path: |-
-            {.spec.clusterIP}
+            {.metadata.uid}
   task: |
     apiVersion: openebs.io/v1alpha1
     kind: Service

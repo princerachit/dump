@@ -5,7 +5,7 @@ metadata:
   namespace: default
 data:
   meta: |
-    runNamespace: {{ .Volume.runNamespace }}
+    runNamespace: default
     apiVersion: v1
     kind: CStorVolumeReplica
     action: put
@@ -17,8 +17,7 @@ data:
     metadata:
       name: {{ .Volume.owner }}-count
       annotations:
-    openebs.io/cstor-pool-guid: {{ .TaskResult.vcr.cstorid}}
+        openebs.io/cstor-pool-guid: default #{{ .TaskResult.vcr.cstorid}}
       spec:
-        cstorControllerIP: {{ .Taskresult.vsvc.clusterIP}}
         volName: {{ .Volume.owner }}
         capacity: {{ .Volume.capacity }}
