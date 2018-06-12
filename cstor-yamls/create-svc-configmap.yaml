@@ -10,10 +10,10 @@ data:
     kind: Service
     action: put
     queries:
-      - alias: objectName
-      - alias: clusterIP
-          path: |-
-            {.metadata.uid}
+    - alias: objectName
+    - alias: clusterIP
+      path: |-
+        {.metadata.uid}
   task: |
     apiVersion: openebs.io/v1alpha1
     kind: Service
