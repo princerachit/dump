@@ -56,8 +56,6 @@ data:
           - args:
             - --cstor-id
             - {{ .TaskResult.vcr.cstorid }}
-            - -- ipaddr
-            - {{ .TaskResult.vsvc.clusterIP }}
             image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
             ports:

@@ -6,7 +6,7 @@ metadata:
 data:
   meta: |
     runNamespace: {{ .Volume.runNamespace }}
-    apiVersion: v1
+    apiVersion: openebs.io/v1alpha1
     kind: Service
     action: put
     queries:
@@ -28,7 +28,7 @@ data:
       name: {{ .Volume.owner }}-ctrl-svc
     spec:
       ports: #check for ports with moteesh
-      - name: iscsi
+      - name: cstor-iscsi
         port: 3260
         protocol: TCP
         targetPort: 3260

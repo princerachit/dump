@@ -5,7 +5,7 @@ metadata:
   namespace: default
 data:
   meta: |
-    runNamespace: default
+    runNamespace: {{ .Volume.runNamespace }}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     action: put
@@ -17,19 +17,13 @@ data:
     metadata:
       name: {{ .Volume.owner }}-1
       labels:
-        openebs.io/cstor-pool-guid: default #{{ .TaskResult.vcr.cstorid}}
+        cstorpool.openebs.io/name: {{ .TaskResult.vpath.poolid }}
+        cstorpool.openebs.io/uid: {{ .TaskResult.vpath.poolname }}
+        cstorvolume.openebs.io/uid: {{ .TaskResult.vcr.cstorid }}
+        cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.owner }}
+        finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
       capacity: {{ .Volume.capacity }}
       cStorControllerIP: {{ .TaskResult.vsvc.clusterIP }}
-
-
-      #       apiVersion: openebs.io/v1alpha1
-      # kind: CStorVolume
-      # metadata:
-      #   name: my-new-cstor-volume
-      # spec:
-      #   cstorControllerIP: 127.0.0.1
-      #   volumeName: mtestvol1
-      #   volumeID: idtestvol1
-      #   capacity: 15G
-      #   status: init
+    status:
+      phase: init
