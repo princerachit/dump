@@ -5,7 +5,7 @@ metadata:
   namespace: default
 data:
   meta: |
-    runNamespace: default #{{ .Volume.runNamespace }}
+    runNamespace: {{ .Volume.runNamespace }}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolume
     action: put
@@ -19,8 +19,9 @@ data:
     kind: CStorVolume
     metadata:
       name: {{ .Volume.owner }}
-      spec:
-        cStorControllerIP: {{ .TaskResult.vsvc.clusterIP }}
-        volumeName: {{ .Volume.owner }}
-        capacity: {{ .Volume.capacity }}
-        status: init
+    spec:
+      cStorControllerIP: {{ .TaskResult.vsvc.clusterIP }}
+      volumeName: {{ .Volume.owner }}
+      volumeId: {{ .Volume.id }}
+      capacity: {{ .Volume.capacity }}
+      status: init
