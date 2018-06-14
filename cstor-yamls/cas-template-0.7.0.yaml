@@ -4,8 +4,10 @@ metadata:
   name: cast-standard-0.7.0
 spec:
   defaultConfig:
-  - name: ControllerImage
-    value: moteesh/cstor-volume-mgmt:local
+  - name: ControllerMgmtImage
+    value: moteesh/cstor-volume-mgmt:ci
+  - name: ControllerIstgtImage
+    value: moteesh/cstor-istgt:ci
   - name: ReplicaCount
     value: "1"
   - name: StoragePool

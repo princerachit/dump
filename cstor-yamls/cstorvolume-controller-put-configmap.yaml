@@ -17,7 +17,9 @@ data:
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
+      name: {{ .Volume.owner }}-ctrl
       labels:
+        app: cstor-volume-manager
         openebs.io/storage-engine-type: cstor
         openebs/volume-provisioner: cstor
         openebs/controller: cstor-controller
@@ -29,7 +31,6 @@ data:
         openebs.io/volume-monitor: "true"
         {{- end}}
         openebs.io/volume-type: cstor
-      name: {{ .Volume.owner }}-ctrl
     spec:
       replicas: 1
       selector:
@@ -41,6 +42,7 @@ data:
           openebs/controller: cstor-controller
           openebs.io/pv: {{ .Volume.owner }}
           vsm: {{ .Volume.owner }}
+          app: cstor-volume-manager
       template:
         metadata:
           labels:
@@ -51,35 +53,58 @@ data:
             openebs/controller: cstor-controller
             openebs.io/pv: {{ .Volume.owner }}
             vsm: {{ .Volume.owner }}
+            app: cstor-volume-manager
         spec:
           containers:
-          - args:
-            - --cstor-id
-            - {{ .TaskResult.vcr.cstorid }}
-            image: {{ .Config.ControllerImage.value }}
-            name: {{ .Volume.owner }}-ctrl-con
+          - image: {{ .Config.ControllerIstgtImage.value }}
+            name: cstor-istgt
             ports:
             - containerPort: 3260
               protocol: TCP
-            - containerPort: 9501
-              protocol: TCP
+            securityContext:
+              privileged: true
+            volumeMounts:
+            - name: sockfile
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
+            - name: dummyfile
+              mountPath: /tmp/cstor
+
           {{- if eq $isMonitor "true" }}
-          - args:
+          - image: {{ $monitorVal }}
+            name: maya-volume-exporter
+            args:
             - -c=http://127.0.0.1:9501
             command:
             - maya-volume-exporter
-            image: {{ $monitorVal }}
-            name: maya-volume-exporter
             ports:
             - containerPort: 9500
               protocol: TCP
           {{- end}}
-          tolerations:
-          - effect: NoExecute
-            key: node.alpha.kubernetes.io/notReady
-            operator: Exists
-            tolerationSeconds: 0
-          - effect: NoExecute
-            key: node.alpha.kubernetes.io/unreachable
-            operator: Exists
-            tolerationSeconds: 0
+
+          - name: cstor-volume-mgmt
+            image: {{ .Config.ControllerMgmtImage.value }}
+            imagePullPolicy: Always
+            ports:
+            - containerPort: 80
+            env:
+            - name: cstorid
+              value: {{ .TaskResult.vcr.cstorid }}
+            securityContext:
+              privileged: true
+            volumeMounts:
+            - name: sockfile
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
+            - name: dummyfile
+              mountPath: /tmp/cstor
+
+          volumes:
+          - name: sockfile
+            emptyDir: {}
+          - name: conf
+            emptyDir: {}
+          - name: dummyfile
+            emptyDir: {}
