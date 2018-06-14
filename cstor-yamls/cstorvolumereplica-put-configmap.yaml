@@ -17,11 +17,11 @@ data:
     metadata:
       name: {{ .Volume.owner }}-1
       labels:
-        cstorpool.openebs.io/name: {{ .TaskResult.vpath.poolid }}
-        cstorpool.openebs.io/uid: {{ .TaskResult.vpath.poolname }}
+        #  cstorpool.openebs.io/name: {{ .TaskResult.vpath.poolid }}
+        #  cstorpool.openebs.io/uid: {{ .TaskResult.vpath.poolname }}
         cstorvolume.openebs.io/uid: {{ .TaskResult.vcr.cstorid }}
         cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.owner }}
-        finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
+        # finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
       capacity: {{ .Volume.capacity }}
       cStorControllerIP: {{ .TaskResult.vsvc.clusterIP }}

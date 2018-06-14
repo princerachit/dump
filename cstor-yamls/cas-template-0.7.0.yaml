@@ -13,8 +13,8 @@ spec:
   run:
     taskNamespace: default
     tasks:
-    - task: cstor-volume-create-get-path-0.7.0
-      id: vpath #find some better name
+      # - task: cstor-volume-create-get-path-0.7.0
+      # - id: vpath #find some better name
     - task: cstor-volume-create-put-service-0.7.0
       id: vsvc
     - task: cstor-volume-create-put-cr-0.7.0
