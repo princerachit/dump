@@ -22,6 +22,6 @@ data:
     spec:
       cStorControllerIP: {{ .TaskResult.vsvc.clusterIP }}
       volumeName: {{ .Volume.owner }}
-      volumeId: {{ .Volume.id }}
+      volumeId: {{ .Volume.uid }}
       capacity: {{ .Volume.capacity }}
       status: init

@@ -15,10 +15,10 @@ data:
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     metadata:
-      name: {{ .Volume.owner }}-1
+      name: {{ .Volume.owner }}-cvr-1
       labels:
-        #  cstorpool.openebs.io/name: {{ .TaskResult.vpath.poolid }}
-        #  cstorpool.openebs.io/uid: {{ .TaskResult.vpath.poolname }}
+        cstorpool.openebs.io/name: {{ .TaskResult.vpool.poolid }}
+        cstorpool.openebs.io/uid: {{ .TaskResult.vpool.name }}
         cstorvolume.openebs.io/uid: {{ .TaskResult.vcr.cstorid }}
         cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.owner }}
         # finalizers: ["cstorvolumereplica.openebs.io/finalizer"]

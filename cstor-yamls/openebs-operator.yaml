@@ -12,6 +12,7 @@ metadata:
   name: openebs-standard
   annotations:
     cas.openebs.io/create-template: cast-standard-0.7.0
+    spc.openebs.io/uid: "123"
 provisioner: openebs.io/provisioner-iscsi
 ---
 apiVersion: v1
@@ -171,7 +172,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-maya-apiserver
-        image: "rachitprince/m-apiserver:log"
+        image: "rachitprince/m-apiserver:poolconfig"
         ports:
         - containerPort: 5656
         env:
