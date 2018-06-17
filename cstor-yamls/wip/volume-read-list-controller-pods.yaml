@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-read-list-controller-pods-0.6.0
+  namespace: default
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs.io/controller=cstor-controller,openebs.io/pv={{ .Volume.owner }}
+    queries:
+    - alias: objectName
+      path: |-
+        {.kind}
+    - alias: podIP
+      path: |-
+        {.items[*].status.podIP}
+    - alias: status
+      path: |-
+        {.items[*].status.containerStatuses[*].ready}

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cstor-volume-create-get-pool-0.7.0
+  namespace: default
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorPool
+    action: list
+    options: |-
+      labelSelector: spc.openebs.io/uid={{ .Volume.spc }}
+    retry: "10,30s"
+    queries:
+    - alias: objectName
+      path: |-
+        {.items[0].kind}
+    - alias: name
+      path: |-
+        {.items[0].metadata.name}
+    - alias: uid
+      path: |-
+        {.items[0].metadata.uid}
