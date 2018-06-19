@@ -17,8 +17,8 @@ data:
     metadata:
       name: {{ .Volume.owner }}-cvr-1
       labels:
-        cstorpool.openebs.io/name: {{ .TaskResult.vpool.uid }}
-        cstorpool.openebs.io/uid: {{ .TaskResult.vpool.name }}
+        cstorpool.openebs.io/name: {{ .TaskResult.vpool.name }}
+        cstorpool.openebs.io/uid: {{ .TaskResult.vpool.uid}}
         cstorvolume.openebs.io/uid: {{ .TaskResult.vcr.cstorid }}
         cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.owner }}
         # finalizers: ["cstorvolumereplica.openebs.io/finalizer"]

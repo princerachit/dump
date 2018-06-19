@@ -79,7 +79,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.5.3
+        image: rachitprince/m-apiserver:poolconfig
         ports:
         - containerPort: 5656
         env:
@@ -166,6 +166,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
    name: openebs-standard
+   annotations:
+     spc.openebs.io/uid: "123"
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"

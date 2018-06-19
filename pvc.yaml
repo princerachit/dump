@@ -7,8 +7,6 @@ metadata:
     controller.openebs.io/affinity: pinit
     controller.openebs.io/affinity-topology: kubernetes.io/hostname
     controller.openebs.io/affinity-type: soft
-  labels:
-    spc.openebs.io/uid: "123"
 spec:
   accessModes:
     - ReadWriteOnce

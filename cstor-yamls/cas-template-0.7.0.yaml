@@ -10,6 +10,8 @@ spec:
     value: moteesh/cstor-istgt:ci
   - name: ReplicaCount
     value: "1"
+  - name: spc
+    value: "123"
   run:
     taskNamespace: default
     tasks:

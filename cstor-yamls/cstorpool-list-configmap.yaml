@@ -10,7 +10,7 @@ data:
     kind: CStorPool
     action: list
     options: |-
-      labelSelector: spc.openebs.io/uid={{ .Volume.spc }}
+      labelSelector: spc.openebs.io/uid={{ .Config.spc.value }}
     retry: "10,30s"
     queries:
     - alias: objectName
