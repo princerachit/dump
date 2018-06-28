@@ -18,6 +18,8 @@ data:
     kind: CStorVolume
     metadata:
       name: {{ .Volume.owner }}
+      labels:
+        openebs.io/pv: {{ .Volume.owner }}
     spec:
       cStorControllerIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
       volumeName: {{ .Volume.owner }}

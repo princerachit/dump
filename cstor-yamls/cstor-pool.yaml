@@ -1,7 +1,7 @@
 apiVersion: openebs.io/v1alpha1
 kind: CStorPool
 metadata:
-  name: my-cstor-pool
+  name: my-cstor-pool-temp
   labels:
     spc.openebs.io/uid: "123"
 spec:

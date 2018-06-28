@@ -6,6 +6,7 @@ metadata:
 data:
   meta: |
     action: output
+    id: cstorvolumeoutput
     kind: CASVolume
     apiVersion: v1alpha1
   task: |

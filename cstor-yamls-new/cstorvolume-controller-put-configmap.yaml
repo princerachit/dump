@@ -11,7 +11,7 @@ data:
     action: put
     id: cvolcreateputctrl
   post: |
-    {{- jsonpath .JsonResult ".metadata.name" | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
     {{- $monitorVal := .Config.VolumeMonitor.value | default "openebs/m-exporter:0.5.0" -}}

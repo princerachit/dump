@@ -7,10 +7,7 @@ spec:
     taskNamespace: default
     tasks:
     - task: volume-read-list-controller-service-0.7.0
-      id: readsvc
     - task: volume-read-list-replica-0.7.0
-      id: readreps
     - task: volume-read-list-controller-pods-0.7.0
-      id: readctrls
-    output:
-      task: volume-read-output-0.7.0
+  output:
+    task: volume-read-output-0.7.0

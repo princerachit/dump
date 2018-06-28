@@ -25,12 +25,12 @@ data:
         cstorpool.openebs.io/uid: {{ .ListItems.currentRepeatResource }}
         cstorvolume.openebs.io/uid: {{ .TaskResult.cvolcreateputvolume.cstorid }}
         cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.owner }}
+        openebs.io/pv: {{ .Volume.owner }}
         # finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
       capacity: {{ .Volume.capacity }}
       cStorControllerIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
     status:
       phase: init
-
   post: |
     {{- jsonpath .JsonResult "{metadata.name}" | trim | saveAs "cstorvolumecreatereplica.objectName" .TaskResult | noop -}}
