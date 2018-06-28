@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-read-output-0.7.0
+  namespace: default
+data:
+  meta: |
+    action: output
+    kind: CASVolume
+    apiVersion: v1alpha1
+  task: |
+    kind: CASVolume
+    apiVersion: v1alpha1
+    metadata:
+      name: {{ .Volume.owner }}
+      annotations:
+        vsm.openebs.io/controller-ips: {{ splitList " " .TaskResult.readctrls.podIP | first }}
+        vsm.openebs.io/cluster-ips: {{ splitList " " .TaskResult.readsvc.clusterIP | first }}
+        vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
+        vsm.openebs.io/replica-count: {{ splitList " " .TaskResult.readreps.cStorPoolName | len }}
+        vsm.openebs.io/volume-size: {{ splitList " " .TaskResult.readreps.capacity | first }}
+        vsm.openebs.io/controller-status: {{ splitList " " .TaskResult.readctrls.status | join "," }}
+        vsm.openebs.io/replica-status: {{ splitList " " .TaskResult.readreps.status | join "," }}
+        vsm.openebs.io/targetportals: {{ splitList " " .TaskResult.readsvc.clusterIP | first }}:3260
+    capacity: {{ splitList " " .TaskResult.readreps.capacity | first }}

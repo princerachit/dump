@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cstor-volume-create-get-path-0.7.0
+  namespace: default
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorPool
+    objectName: {{ .Volume.CStorPool }}
+    action: get
+    queries:
+    - alias: objectName
+    - alias: id
+      path: |-
+        {.metadata.uid}
