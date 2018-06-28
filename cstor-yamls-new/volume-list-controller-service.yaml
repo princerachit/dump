@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-list-list-controller-service-0.7.0
+  namespace: default
+data:
+  meta: |
+    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    id: listlistsvc
+    repeatWith:
+      kind: namespace
+      resources:
+      {{- range $k, $ns := $nss }}
+      - {{ $ns }}
+      {{- end }}
+    apiVersion: v1
+    kind: Service
+    action: list
+    options: |-
+      labelSelector: openebs.io/controller-service=cstor-controller-svc
+  post: |
+    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/pv} clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs | asKeyMap "volumeList" .ListItems | noop -}}

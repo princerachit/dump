@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-list-list-replicas-0.7.0
+  namespace: default
+data:
+  meta: |
+    id: listlistrep
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    action: list
+  post: |
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={default/{@.metadata.labels.openebs\.io/pv} replicaName={@.metadata.name} capacity={@.spec.capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs | asKeyMap "volumeList" .ListItems | noop -}}
