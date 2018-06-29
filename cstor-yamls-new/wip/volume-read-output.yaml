@@ -19,9 +19,8 @@ data:
         vsm.openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
         vsm.openebs.io/cluster-ips: {{ .TaskResult.readlistsvc.clusterIP }}
         vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
+        vsm.openebs.io/replica-count: {{ .TaskResult.readlistrep.items | default "" | splitList " " | len }}
         vsm.openebs.io/volume-size: {{ $capacity }}
-        vsm.openebs.io/replica-ips: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | join "," }}
         vsm.openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
         vsm.openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
     spec:
