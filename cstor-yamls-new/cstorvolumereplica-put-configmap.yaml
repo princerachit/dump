@@ -19,7 +19,7 @@ data:
     kind: CStorVolumeReplica
     apiVersion: openebs.io/v1alpha1
     metadata:
-      name: cstorpool-{{ .ListItems.currentRepeatResource }}
+      name: cstorvolumereplica-{{ .ListItems.currentRepeatResource }}
       labels:
         cstorpool.openebs.io/name: {{ pluck .ListItems.currentRepeatResource .ListItems.cvolPoolList.pools | first }}
         cstorpool.openebs.io/uid: {{ .ListItems.currentRepeatResource }}

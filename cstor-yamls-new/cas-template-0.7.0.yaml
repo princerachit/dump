@@ -8,8 +8,6 @@ spec:
     value: moteesh/cstor-volume-mgmt:ci
   - name: ControllerIstgtImage
     value: moteesh/cstor-istgt:ci
-  - name: ReplicaCount
-    value: "1"
   - name: spc
     value: "123"
   taskNamespace: default

@@ -18,7 +18,6 @@ data:
     {{- $controllerIP := pluck "controllerIP" $map | first }}
     {{- $controllerStatus := pluck "controllerStatus" $map | first }}
     {{- $replicaName := pluck "replicaName" $map | first }}
-    {{- $replicaStatus := pluck "replicaStatus" $map | first }}
     {{- $name := $pkey | splitList "/" | last }}
     {{- $ns := $pkey | splitList "/" | first }}
       - kind: CASVolume
@@ -32,7 +31,6 @@ data:
             vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ $name }}
             vsm.openebs.io/replica-count: {{ $replicaName | default "" | splitList ", " | len }}
             vsm.openebs.io/volume-size: {{ $capacity }}
-            vsm.openebs.io/replica-status: {{ $replicaStatus | replace "true" "running" | replace "false" "notready" }}
             vsm.openebs.io/controller-status: {{ $controllerStatus | replace "true" "running" | replace "false" "notready" }}
             vsm.openebs.io/targetportals: {{ $clusterIP }}:3260
         spec:

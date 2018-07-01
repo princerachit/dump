@@ -17,7 +17,7 @@ data:
     kind: Pod
     action: list
     options: |-
-      labelSelector: openebs.io/controller=jiva-controller
+      labelSelector: openebs.io/controller=cstor-controller
   post: |
     {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/pv} controllerIP={@.status.podIP} controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
     {{- $controllerPairs | asKeyMap "volumeList" .ListItems | noop -}}

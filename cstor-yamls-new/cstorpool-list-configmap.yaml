@@ -12,7 +12,6 @@ data:
     action: list
     options: |-
       labelSelector: spc.openebs.io/uid={{ .Config.spc.value }}
-    retry: "10,30s"
   post: |
     {{- $poolsList := jsonpath .JsonResult `{range .items[*]}pkey=pools {@.metadata.uid}={@.metadata.name};{end}` | trim | default "" | splitList ";" -}}
     {{- $poolsList | asKeyMap "cvolPoolList" .ListItems | noop -}}

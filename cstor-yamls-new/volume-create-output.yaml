@@ -16,7 +16,7 @@ data:
       name: {{ .Volume.owner }}
       annotations:
         vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .Config.ReplicaCount.value }}
+        #vsm.openebs.io/replica-count: {{ .Config.ReplicaCount.value }}
         vsm.openebs.io/volume-size: {{ .Volume.capacity }}
         vsm.openebs.io/targetportals: {{ .TaskResult.cvolcreateputsvc.clusterIP }}:3260
-    capacity: {{ .Volume.capacity }}
+    capacity: {{ .Volume.capacity }}#derive from cstor volume replica

@@ -10,5 +10,5 @@ data:
     kind: CStorVolumeReplica
     action: list
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={default/{@.metadata.labels.openebs\.io/pv} replicaName={@.metadata.name} capacity={@.spec.capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey=default/{@.metadata.labels.openebs\.io/pv} replicaName={@.metadata.name} capacity={@.spec.capacity};{end}` | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | asKeyMap "volumeList" .ListItems | noop -}}
