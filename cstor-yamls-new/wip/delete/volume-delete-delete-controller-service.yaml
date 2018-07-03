@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-delete-delete-controller-service-0.7.0
+  namespace: default
+data:
+  meta: |
+    id: deletedeletesvc
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Service
+    action: delete
+    objectName: {{ .TaskResult.deletelistsvc.names }}

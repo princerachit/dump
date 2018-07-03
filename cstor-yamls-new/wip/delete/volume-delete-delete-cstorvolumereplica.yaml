@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-delete-delete-cstorvolumereplica-0.7.0
+  namespace: default
+data:
+  meta: |
+    {{- $cvrs := keys .ListItems.cvrlist.cvrs }}
+    {{- $deletecvrs := join "," $cvrs }}
+    id: deletedeletecvr
+    action: delete
+    kind: CStorVolumeReplica
+    objectName: {{ $deletecvrs }}
+    apiVersion: openebs.io/v1alpha1

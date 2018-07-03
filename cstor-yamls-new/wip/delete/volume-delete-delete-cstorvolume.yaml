@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-delete-delete-cstorvolume-0.7.0
+  namespace: default
+data:
+  meta: |
+    id: deletedeletecsv
+    action: delete
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    objectName: {{ pluck "names" .TaskResult.deletelistcsv | first }}
