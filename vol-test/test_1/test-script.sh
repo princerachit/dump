@@ -3,6 +3,13 @@
 source ../util.sh
 # TODO: Copy csp status test from ashutosh's code
 
+cleanUp()
+{
+    kubectlDelete app.yaml
+    kubectlDelete pvc.yaml
+    sleep 5
+    kubectlDelete sc.yaml
+}
 # Apply storage class
 echo Applying sc
 kubectlApply sc.yaml
@@ -21,13 +28,14 @@ appStatus=
 try=1
 until [ "$appStatus" == "Running"  ] || [ $try == 30 ]; do
     echo Checking status of application try $try:
-    appStatus=$(kubectl get po -l name=percona -o jsonpath='{.items[0].status.phase}')
+    appStatus=$(kubectl get po -l name=nginx -o jsonpath='{.items[0].status.phase}')
     try=`expr $try + 1`
     sleep 5
 done
 
 if [ "$appStatus" == "Running" ]; then
-    echo test successful
+    echo application is in Running state
+    cleanUp
+    exit 0
 fi
-
 exit 1

@@ -18,7 +18,7 @@ kubectlDelete()
     # append all the files together prefixed with -f
     filesToDelete=""
     while [ "$1" != "" ]; do
-        filesToDelete=$filesToDelete -f $1
+        filesToDelete="$filesToDelete -f $1"
         sleep 1
         shift
     done

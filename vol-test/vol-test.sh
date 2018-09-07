@@ -4,10 +4,27 @@
 # source util file
 source util.sh
 
+runTest()
+{
+    for testCase in test_*; do
+        echo *******************
+        echo running $testCase
+        echo *******************
+        cd $testCase
+        bash test-script.sh
+        if [ "$?" == "0" ]; then
+            echo Success: $testCase
+        else
+            echo Fail: $testCase
+        fi
+        cd ..
+        echo *******************
+    done
+}
 # Setup operator
 setupOperator()
 {
-    opYaml=$1
+    opYaml="$1"
     echo using operator file $opYaml
     kubectl apply -f $opYaml
 }
@@ -15,7 +32,7 @@ setupOperator()
 # Setup pool
 setupPool()
 {
-    poolYaml=$1
+    poolYaml="$1"
     echo using pool file $poolYaml
     kubectl apply -f $poolYaml
 }
@@ -65,6 +82,4 @@ setupPool $POOL_FILE
 
 # Call test cases
 # go inside each test case directory. execute the test script and then cd back
-cd ./1
-bash test-script.sh
-cd ..
+runTest
