@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    openebs.io/cas-type: cstor
+    openebs.io/persistent-volume: PVNAME
+    openebs.io/storage-engine-type: cstor
+    openebs.io/target-service: cstor-target-svc
+  name: PVNAME
+spec:
+  ports:
+  - name: cstor-iscsi
+    port: 3260
+    protocol: TCP
+    targetPort: 3260
+  - name: mgmt
+    port: 6060
+    protocol: TCP
+    targetPort: 6060
+  selector:
+    app: cstor-volume-manager
+    openebs.io/persistent-volume: PVNAME
+    openebs.io/target: cstor-target
+  type: ClusterIP

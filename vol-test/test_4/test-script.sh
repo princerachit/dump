@@ -18,6 +18,9 @@ kubectlApply sc.yaml
 echo Applying pvc
 kubectlApply pvc.yaml
 
+echo Applying csp
+kubectlApply csp.yaml
+
 # sleep as image pulling takes time
 sleep 10
 pvStatus=

@@ -1,0 +1,12 @@
+apiVersion: openebs.io/v1alpha1
+kind: CStorPool
+metadata:
+  labels:
+    kubernetes.io/hostname: gke-prince-cluster-pool-1-1ddefaed-dd4h
+    openebs.io/storage-pool-claim: cstor-pool-default-0.7.0
+  name: cstor-pool-default-0.7.0-hqy8
+spec:
+  disks:
+    diskList:
+status:
+  phase: Offline

@@ -32,7 +32,8 @@ until [ "$appStatus" == "Running"  ] || [ $try == 30 ]; do
     try=`expr $try + 1`
     sleep 5
 done
-
+kubectl get svc -n openebs --export > compsvc.yaml
+sleep 30
 if [ "$appStatus" == "Running" ]; then
     echo application is in Running state
     cleanUp

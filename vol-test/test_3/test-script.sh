@@ -28,15 +28,23 @@ kubectlApply pvc.yaml
 sleep 10
 pvStatus=
 try=1
-until [ "$pvStatus" == "Pending"  ] || [ $try == 10 ]; do
+until [ "$pvStatus" == "Pending" ] || [ "$try" == "5" ] || [ "$pvStatus" == "Bound" ]; do
     echo Checking status of pvc,try $try:
     pvStatus=$(kubectl get pvc openebs-pvc -o jsonpath='{.status.phase}')
     try=`expr $try + 1`
     sleep 5
 done
 
+echo pvcStatus: $pvStatus
+if [ "$pvStatus" == "Bound" ]; then
+    echo Unexpected: pvc in running state
+    cleanUp
+    exit 1
+fi
+
 if [ "$pvStatus" == "Pending" ]; then
    error=$(kubectl describe pvc openebs-pvc | grep "service already" | wc -l)
+   echo service already grepping resulted int $error value
    if [ "$error" == "0" ]; then
        echo expected error not found
        cleanUp

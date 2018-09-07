@@ -7,18 +7,22 @@ source util.sh
 runTest()
 {
     for testCase in test_*; do
-        echo *******************
-        echo running $testCase
-        echo *******************
+        echo "-----------------------------------------------------"
+        echo -e ${YELLOW}running $testCase${NC}
+        echo "-----------------------------------------------------"
         cd $testCase
         bash test-script.sh
-        if [ "$?" == "0" ]; then
-            echo Success: $testCase
+        exitValue=$?
+        echo "-----------------------------------------------------"
+        echo exit value: $exitValue
+        if [ "$exitValue" == "0" ]; then
+            echo -e ${GREEN}Success: $testCase${NC}
         else
-            echo Fail: $testCase
+            echo -e ${RED}Fail: $testCase${NC}
         fi
+        echo "deleting residual pods if any"
+        kubectl delete po -n openebs -l "openebs.io/persistent-volume-claim=openebs-pvc" --force --grace-period=0
         cd ..
-        echo *******************
     done
 }
 # Setup operator
@@ -73,6 +77,7 @@ done
 
 if [ "$appStatus" != "Running" ]; then
     echo Maya api server pod not up yet. Exiting...
+    sleep 10
     exit 0
 fi
 
@@ -83,3 +88,5 @@ setupPool $POOL_FILE
 # Call test cases
 # go inside each test case directory. execute the test script and then cd back
 runTest
+
+bash ./delete.sh

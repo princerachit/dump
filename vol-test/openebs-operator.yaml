@@ -99,7 +99,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: IfNotPresent
-        image: openebs/m-apiserver:0.7.0
+        image: rachitprince/m-apiserver:remove-dummy
         ports:
         - containerPort: 5656
         env:
