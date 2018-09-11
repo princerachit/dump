@@ -3,8 +3,39 @@
 source ../util.sh
 # TODO: Copy csp status test from ashutosh's code
 
+reincarnate()
+{
+    echo scaling down cstor pool deploys replica to 0
+    kubectl scale deploy -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 --replicas=0 -n openebs
+    if [ "$?" != "0" ]; then
+        exit $?
+    fi
+    sleep 15
+
+    try=1
+    aliveTargets=
+    until [ "$aliveTargets" == "0" ] || [ $try == 10 ]; do
+        aliveTargets=`kubectl get po -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 -n openebs -o jsonpath='{.items[?(@.status.phase=="Running")].status.phase}' | wc -l`
+        try=`expr $try + 1`
+        sleep 5
+    done
+
+    if [ $try == 10 ]; then
+        echo target could not be killed in given duration
+        cleanUp
+        exit 1
+    fi
+
+    echo Scaling up cstor pool deploys count back to 1
+    kubectl scale deploy -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 --replicas=1 -n openebs
+    if [ "$?" != "0" ]; then
+        exit $?
+    fi
+    sleep 10
+}
 cleanUp()
 {
+    kubectlDelete app.yaml
     kubectlDelete pvc.yaml
     sleep 5
     kubectlDelete sc.yaml
@@ -18,34 +49,53 @@ kubectlApply sc.yaml
 echo Applying pvc
 kubectlApply pvc.yaml
 
-echo Applying csp
-kubectlApply csp.yaml
+echo Applying app
+kubectlApply app.yaml
 
 # sleep as image pulling takes time
 sleep 10
-pvStatus=
+appStatus=
 try=1
-until [ "$pvStatus" == "Pending" ] || [ "$try" == "5" ] || [ "$pvStatus" == "Bound" ]; do
-    echo Checking status of pvc,try $try:
-    pvStatus=$(kubectl get pvc openebs-pvc -o jsonpath='{.status.phase}')
+until [ "$appStatus" == "Running"  ] || [ $try == 30 ]; do
+    echo Checking status of application try $try:
+    appStatus=$(kubectl get po -l name=nginx -o jsonpath='{.items[0].status.phase}')
     try=`expr $try + 1`
     sleep 5
 done
 
-echo pvcStatus: $pvStatus
-if [ "$pvStatus" == "Bound" ]; then
-    echo Unexpected: pvc in running state
+if [ "$appStatus" == "Running" ]; then
+    echo application is in running state
+    reincarnate
+else
+    echo application did not come up.
+    cleanUp
     exit 1
 fi
 
-if [ "$pvStatus" == "Pending" ]; then
-   error=$(kubectl describe pvc openebs-pvc | grep "not enough pool" | wc -l)
-   echo not enough pool grepping resulted int $error value
-   if [ "$error" == "0" ]; then
-       echo expected error not found
-       cleanUp
-       exit 1
-   fi
+
+try=1
+appName=`kubectl get po -l name=nginx -o jsonpath='{.items[0].metadata.name}'`
+writeStatus="0"
+
+# writeStatus is the exit code obtained while killing the touch command
+# if it was killed then touch was not completed, otherwise it was completed
+until [ "$writeStatus" != "0"  ] || [ $try == 30 ]; do
+    echo trying to write file to openebs vol in the app
+    kubectl exec -it $appName -- touch /var/lib/openebsvol/text.file &
+    sleep 5
+    pid=$!
+    kill $pid
+    writeStatus="$?"
+    try=`expr $try + 1`
+done
+
+echo last writeStatus $writeStatus
+if [ "$writeStatus" == "0" ]; then
+    echo file creation was successful in openebs vol
+    cleanUp
+    exit 0
 fi
+
+echo file creation failed in openebs vol
 cleanUp
-exit 0
+exit 1

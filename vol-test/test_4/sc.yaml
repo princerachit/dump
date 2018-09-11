@@ -8,6 +8,6 @@ metadata:
       - name: StoragePoolClaim
         value: "cstor-pool-default-0.7.0"
       - name: ReplicaCount
-        value: "8"
+        value: "3"
 provisioner: openebs.io/provisioner-iscsi
 ---

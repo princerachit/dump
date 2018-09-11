@@ -4,9 +4,14 @@
 # source util file
 source util.sh
 
+usage()
+{
+    echo bash vol-test.sh -o operator.yaml -o pool.yaml
+}
+
 runTest()
 {
-    for testCase in test_*; do
+    for testCase in test_4; do
         echo "-----------------------------------------------------"
         echo -e ${YELLOW}running $testCase${NC}
         echo "-----------------------------------------------------"
@@ -56,6 +61,11 @@ while getopts "o:p:" opt; do
             ;;
     esac
 done
+
+if [ "$OP_FILE" == "" ] || [ "$POOL_FILE" == "" ]; then
+    usage
+    exit 1
+fi
 
 echo using operator yaml $OP_FILE and pool yaml $POOL_FILE
 

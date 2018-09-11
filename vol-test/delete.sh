@@ -10,6 +10,8 @@ if [ "$OP_FILE" == "" ]; then
     OP_FILE="openebs-operator.yaml"
 fi
 
+kubectl delete po -n openebs -l "openebs.io/persistent-volume-claim=openebs-pvc" --force --grace-period=0
+
 kubectlDelete $POOL_FILE
 kubectlDelete $OP_FILE
 
