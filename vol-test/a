@@ -1,0 +1,6 @@
+printf "%s\n" "-------"
+echo this
+printf "%s" "-------"
+printf "%s" "-------"
+printf "%s" "-------"
+printf "%s" "-------"

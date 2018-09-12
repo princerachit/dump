@@ -1,7 +1,6 @@
 #!bin/bash
 
 source ../util.sh
-# TODO: Copy csp status test from ashutosh's code
 
 cleanUp()
 {
@@ -22,14 +21,17 @@ kubectlApply pvc.yaml
 sleep 10
 pvStatus=
 try=1
+printf "%s" "Checking status of pvc:"
 until [ "$pvStatus" == "Pending" ] || [ "$try" == "5" ] || [ "$pvStatus" == "Bound" ]; do
-    echo Checking status of pvc,try $try:
+    printf " %s" "$try"
     pvStatus=$(kubectl get pvc openebs-pvc -o jsonpath='{.status.phase}')
     try=`expr $try + 1`
     sleep 5
 done
 
-echo pvcStatus: $pvStatus
+echo ""
+
+echo PVC status: $pvStatus
 if [ "$pvStatus" == "Bound" ]; then
     echo Unexpected: pvc in running state
     exit 1
@@ -37,9 +39,9 @@ fi
 
 if [ "$pvStatus" == "Pending" ]; then
    error=$(kubectl describe pvc openebs-pvc | grep "not enough pool" | wc -l)
-   echo not enough pool grepping resulted int $error value
+   echo Grepping \'not enough pool\' resulted $error value/s
    if [ "$error" == "0" ]; then
-       echo expected error not found
+       echo Expected error not found
        cleanUp
        exit 1
    fi

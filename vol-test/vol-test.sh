@@ -11,7 +11,7 @@ usage()
 
 runTest()
 {
-    for testCase in test_4; do
+    for testCase in test_*; do
         echo "-----------------------------------------------------"
         echo -e ${YELLOW}running $testCase${NC}
         echo "-----------------------------------------------------"

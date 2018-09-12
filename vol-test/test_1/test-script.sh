@@ -26,16 +26,17 @@ kubectlApply app.yaml
 sleep 10
 appStatus=
 try=1
+printf "%s" "Checking status of application"
 until [ "$appStatus" == "Running"  ] || [ $try == 30 ]; do
-    echo Checking status of application try $try:
+    printf " %s" $try
     appStatus=$(kubectl get po -l name=nginx -o jsonpath='{.items[0].status.phase}')
     try=`expr $try + 1`
-    sleep 5
+    sleep 6
 done
-kubectl get svc -n openebs --export > compsvc.yaml
-sleep 30
+echo ""
+
 if [ "$appStatus" == "Running" ]; then
-    echo application is in Running state
+    echo Application is in Running state
     cleanUp
     exit 0
 fi

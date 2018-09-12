@@ -1,3 +1,3 @@
-NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
-default-openebs-pvc-1597174297   ClusterIP   10.63.250.98    <none>        3260/TCP,6060/TCP   2m
-maya-apiserver-service           ClusterIP   10.63.245.114   <none>        5656/TCP            3m
+NAME                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+default-openebs-pvc-307315045   ClusterIP   10.63.249.215   <none>        3260/TCP,6060/TCP   2m
+maya-apiserver-service          ClusterIP   10.63.249.137   <none>        5656/TCP            3m

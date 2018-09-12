@@ -12,20 +12,22 @@ reincarnate()
     sleep 15
 
     try=1
-    alivePools=
-    printf "%s " "Checking if pool pods are killed"
-    until [ "$alivePools" == "0" ] || [ $try == 10 ]; do
-        alivePools=`kubectl get po -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 -n openebs -o jsonpath='{.items[?(@.status.phase=="Running")].status.phase}' | wc -l`
+    aliveTargets=
+    printf "%s " "Checking if target pods are killed"
+    until [ "$aliveTargets" == "0" ] || [ $try == 10 ]; do
+        printf "%s " $try
+        aliveTargets=`kubectl get po -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 -n openebs -o jsonpath='{.items[?(@.status.phase=="Running")].status.phase}' | wc -l`
         try=`expr $try + 1`
         sleep 5
     done
+    echo ""
 
     if [ $try == 10 ]; then
-        echo Pool pods could not be killed in given duration
+        echo Target could not be killed in given duration
         cleanUp
         exit 1
     fi
-    echo "All pool pods killed"
+    echo "All target pods killed"
     echo Scaling up cstor pool deploys count back to 1
     kubectl scale deploy -l openebs.io/storage-pool-claim=cstor-pool-default-0.7.0 --replicas=1 -n openebs
     if [ "$?" != "0" ]; then

@@ -5,7 +5,7 @@ source ../util.sh
 
 reincarnate()
 {
-    echo scaling down target replica to 0
+    echo Scaling down target replica to 0
     kubectl scale deploy -l openebs.io/persistent-volume-claim=openebs-pvc --replicas=0 -n openebs
     if [ "$?" != "0" ]; then
         exit $?
@@ -74,14 +74,16 @@ fi
 
 
 try=1
-appName=`kubectl get po -l name=nginx -o jsonpath='{.items[0].metadata.name}'`
 writeStatus=
 
-until [ "$writeStatus" == "0"  ] || [ $try == 30 ]; do
+export appName=`kubectl get po -l name=nginx -o jsonpath='{.items[0].metadata.name}'`
+until [ "$writeStatus" == "0"  ] || [ $try == 20 ]; do
     echo trying to write file to openebs vol in the app
-    /usr/bin/timeout 5 kubectl exec -it $appName -- touch /var/lib/openebsvol/text.file
-    writeStatus=$?
-    sleep 5
+    bash sanity-script.sh &
+    pid=$!
+    sleep 8
+    kill $pid
+    writeStatus=`cat write-status.txt`
     try=`expr $try + 1`
 done
 
