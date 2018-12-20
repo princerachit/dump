@@ -1,0 +1,176 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  labels:
+    version: 0.8.0
+  name: cstor-volume-create-puttargetdeployment-default-0.8.0
+  namespace: "openebs"
+spec:
+  meta: |
+    {{- $isClone := .Volume.isCloneEnable | default "false" -}}
+    {{- $runNamespace := .Config.RunNamespace.value -}}
+    {{- $pvcServiceAccount := .Config.PVCServiceAccount.value | default "" -}}
+    {{- if ne $pvcServiceAccount "" }}
+    runNamespace: {{ .Volume.runNamespace }}
+    {{ else }}
+    runNamespace: {{ $runNamespace }}
+    {{- end }}
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    action: put
+    id: cvolcreateputctrl
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
+  task: |-
+    {{- $isMonitor := .Config.VolumeMonitorImage.enabled | default "true" | lower -}}
+    {{- $setResourceRequests := .Config.TargetResourceRequests.value | default "none" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.TargetResourceRequests.value -}}
+    {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "none" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
+    {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "none" -}}
+    {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
+    {{- $targetAffinityVal := .TaskResult.creategetpvc.targetAffinity -}}
+    apiVersion: apps/v1beta1
+    Kind: Deployment
+    metadata:
+      name: {{ .Volume.owner }}-target
+      labels:
+        app: cstor-volume-manager
+        openebs.io/storage-engine-type: cstor
+        openebs.io/cas-type: cstor
+        openebs.io/target: cstor-target
+        openebs.io/persistent-volume: {{ .Volume.owner }}
+        openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+        openebs.io/version: {{ .CAST.version }}
+        openebs.io/cas-template-name: {{ .CAST.castName }}
+      annotations:
+        {{- if eq $isMonitor "true" }}
+        openebs.io/volume-monitor: "true"
+        {{- end}}
+        openebs.io/volume-type: cstor
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: cstor-volume-manager
+          openebs.io/target: cstor-target
+          openebs.io/persistent-volume: {{ .Volume.owner }}
+      template:
+        metadata:
+          labels:
+            {{- if eq $isMonitor "true" }}
+            monitoring: volume_exporter_prometheus
+            {{- end}}
+            app: cstor-volume-manager
+            openebs.io/target: cstor-target
+            openebs.io/persistent-volume: {{ .Volume.owner }}
+            openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+        spec:
+          serviceAccountName: {{ .Config.PVCServiceAccount.value | default .Config.ServiceAccountName.value }}
+          {{- if ne $targetAffinityVal "none" }}
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: openebs.io/target-affinity
+                    operator: In
+                    values:
+                    - {{ $targetAffinityVal }}
+                topologyKey: kubernetes.io/hostname
+                namespaces: [{{.Volume.runNamespace}}]
+          {{- end }}
+          containers:
+          - image: {{ .Config.VolumeTargetImage.value }}
+            name: cstor-istgt
+            imagePullPolicy: IfNotPresent
+            resources:
+              {{- if ne $setResourceLimits "none" }}
+              limits:
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "none" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
+            ports:
+            - containerPort: 3260
+              protocol: TCP
+            securityContext:
+              privileged: true
+            volumeMounts:
+            - name: sockfile
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
+            - name: tmp
+              mountPath: /tmp
+              mountPropagation: Bidirectional
+          {{- if eq $isMonitor "true" }}
+          - image: {{ .Config.VolumeMonitorImage.value }}
+            name: maya-volume-exporter
+            {{- if ne $setAuxResourceLimits "none" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
+            args:
+            - "-e=cstor"
+            command: ["maya-exporter"]
+            ports:
+            - containerPort: 9500
+              protocol: TCP
+            volumeMounts:
+            - name: sockfile
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
+          {{- end }}
+          - name: cstor-volume-mgmt
+            image: {{ .Config.VolumeControllerImage.value }}
+            {{- if ne $setAuxResourceLimits "none" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
+            imagePullPolicy: IfNotPresent
+            ports:
+            - containerPort: 80
+            env:
+            - name: OPENEBS_IO_CSTOR_VOLUME_ID
+              value: {{ .TaskResult.cvolcreateputvolume.cstorid }}
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            securityContext:
+              privileged: true
+            volumeMounts:
+            - name: sockfile
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
+            - name: tmp
+              mountPath: /tmp
+              mountPropagation: Bidirectional
+          volumes:
+          - name: sockfile
+            emptyDir: {}
+          - name: conf
+            emptyDir: {}
+          - name: tmp
+            hostPath:
+              path: /var/openebs/shared-{{ .Volume.owner }}-target
+              type: DirectoryOrCreate

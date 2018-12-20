@@ -1,0 +1,23 @@
+apiVersion: v1
+count: 27
+eventTime: null
+firstTimestamp: 2018-11-14T04:50:50Z
+involvedObject:
+  apiVersion: openebs.io/v1alpha1
+  kind: CStorVolume
+  name: pvc-97cf91f9-e707-11e8-ae2e-42010a8001fa
+  namespace: openebs
+  resourceVersion: "11452478"
+  uid: 97f8fb39-e707-11e8-ae2e-42010a8001fa
+kind: Event
+lastTimestamp: 2018-11-14T05:03:51Z
+message: Volume is in Degraded state
+metadata:
+  namespace: openebs
+  creationTimestamp: null
+  name: pvc-97cf91f9-e707-11e8-ae2e-42010a8001fa.Degraded
+  selfLink: /api/v1/namespaces/openebs/events/pvc-97cf91f9-e707-11e8-ae2e-42010a8001fa.Degraded
+reportingComponent: ""
+reportingInstance: ""
+source:
+  component: Target Deployment

@@ -1,0 +1,22 @@
+apiVersion: v1
+count: 121
+involvedObject:
+  apiVersion: openebs.io/v1alpha1
+  kind: CStorVolume
+  name: pvc-97cf91f9-e707-11e8-ae2e-42010a8001fa
+  namespace: openebs
+  uid: 97f8fb39-e707-11e8-ae2e-42010a8001fa
+kind: Event
+lastTimestamp: 2018-11-13T08:28:55Z
+firstTimestamp: 2018-11-13T05:48:41Z
+message: Volume went to 'Init' stateaaas
+metadata:
+  creationTimestamp: null
+  name: cvevent.random
+  namespace: openebs
+reason: Synced
+reportingComponent: ""
+reportingInstance: ""
+source:
+  component: CStorVolume-controller
+type: Normal

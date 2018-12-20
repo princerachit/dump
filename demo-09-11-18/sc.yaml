@@ -1,13 +1,20 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: openebs-cstor-default-0.7.0
   annotations:
-    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-pool-default-0.7.0"
       - name: ReplicaCount
         value: "3"
+      - name: PVCServiceAccount
+        value: "default-maya-operator"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"cas.openebs.io/config":"- name: StoragePoolClaim\n  value: \"cstor-pool-default-0.7.0\"\n- name: ReplicaCount\n  value: \"3\"\n","openebs.io/cas-type":"cstor"},"name":"openebs-cstor-default-0.7.0"},"provisioner":"openebs.io/provisioner-iscsi"}
+    openebs.io/cas-type: cstor
+  creationTimestamp: null
+  name: openebs-cstor-default-0.7.0
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/openebs-cstor-default-0.7.0
 provisioner: openebs.io/provisioner-iscsi
----
+reclaimPolicy: Delete
+volumeBindingMode: Immediate

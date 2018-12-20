@@ -1,0 +1,17 @@
+apiVersion: v1
+involvedObject:
+  apiVersion: openebs.io/v1alpha1
+  kind: CStorVolume
+  name: pvc-97cf91f9-e707-11e8-ae2e-42010a8001fa
+  namespace: openebs
+kind: Event
+message: CSV phase change to Error
+metadata:
+  name: random
+  namespace: openebs
+reason: Synced
+reportingComponent: ""
+reportingInstance: ""
+source:
+  component: CStorVolume
+type: Normal
