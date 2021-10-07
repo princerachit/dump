@@ -1,0 +1,15 @@
+scenarios:
+  - name: K3s ws testsing
+    engine: ws # Enable the Socket.io engine
+    flow:
+      - send: "gp ws test.."
+config:
+  target: "ws://34.83.23.232:8010"
+  phases:
+    - duration: 1000
+      arrivalRate: 3
+  ws:
+    # Set WebSocket subprotocols:
+    subprotocols:
+      - json
+      - soap

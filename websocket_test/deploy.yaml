@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  name: ws-example
+  labels:
+    name: ws-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ws-example
+  template:
+    metadata:
+      labels:
+        name: ws-example
+        openebs.io/target-affinity: ws-example
+    spec:
+      containers:
+        - resources:
+            limits:
+              cpu: 1
+          name: ws-example
+          image: ksdn117/web-socket-test
+
